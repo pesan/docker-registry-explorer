@@ -1,0 +1,136 @@
+<div class="container">
+	<h1>
+		<div class="btn-group pull-right">
+			<button class="btn btn-sm btn-default" title="Refresh"
+				ng-click="restate({ reload: true })">
+				<i class="fa fa-refresh"></i>
+			</button>
+		</div>
+		Browse
+	</h1>
+	<div class="row">
+		<div class="col-sm-8 col-md-6">
+			<form class="form" ng-submit="restate()">
+				<label class="sr-only" for="query">Image name</label>
+				<div class="input-group">
+					<input type="text" id="query" size="40" placeholder="Search terms"
+						class="form-control has-extension" ng-model="query" focus="!query"></input>
+					<div class="input-group-btn">
+						<input type="reset" class="btn btn-default fa control-extension" value="&#xf00d"
+							tabindex="-1" ng-click="query=''; restate()"></input>
+						<input type="submit" class="btn btn-primary fa" value="Find &#xf002;"></input>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<h1 ng-if="hasHosts">Images</h1>
+	<div ng-repeat="(hostname, host) in hosts">
+		<div class="btn-group pull-right">
+			<button class="btn btn-sm btn-default" title="Delete {{ hostname }}"
+				ng-click="removeHost(hostname)">
+				<i class="fa fa-trash"></i>
+			</button>
+		</div>
+		<table class="table table-condensed" ng-if="host.error || !host.images">
+			<thead>
+				<tr>
+					<th>
+						<i class="fa fa-database"></i>
+						{{ hostname }}
+					</th>
+					<th ng-if="host.error">
+						<button class="btn text-danger" title="Click to toggle error details"
+								ng-click="host.showError =! host.showError">
+							<i class="fa fa-warning"></i>
+							<span class="hidden-xs hidden-sm">Unable to explore this registry</span>
+						</button>
+					</th>
+				</tr>
+			</thead>
+		</table>
+		<div class="text-center" ng-if="host.error">
+			<div collapse="!host.showError">
+				<pre class="text-left">{{ host.error }}</pre>
+			</div>
+		</div>
+		<table class="table table-condensed" ng-if="!host.error && host.images">
+			<thead>
+				<tr>
+					<th colspan="3">
+						<i class="fa fa-database"></i> {{ hostname }}
+					</th>
+				</tr>
+				<tr>
+					<th>
+						Image name
+					</th>
+					<th>
+						<i class="fa fa-tag"></i> Tags
+					</th>
+					<th>
+						<i class="fa fa-external-link"></i> URL
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="image in host.images">
+					<td>
+						<code>{{ image.name }}</code>
+					</td>
+					<td>
+						<div class="list-inline">
+							<button
+								class="tag btn label label-default"
+								ng-class="{'label-primary': image.tag.name==tag.name}"
+								ng-click="selectTag(image, tag)"
+								ng-repeat="tag in image.tags">
+								{{ tag.name }}
+							</button>
+						</div>
+					</td>
+					<td>
+						<code>{{ image.tag.url }}</code>
+					</td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="3">
+						<pagination
+							items-per-page="host._page.size"
+							total-items="host._page.total"
+							rotate="false"
+							boundary-links="true"
+							max-size="pagerSize"
+							ng-model="host._page.current"
+							ng-change="restate()"
+							previous-text="&lsaquo;"
+							next-text="&rsaquo;"
+							first-text="&laquo;"
+							last-text="&raquo;">
+						</pagination>
+					</td> 
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+	<div>
+		<h2>Add registry</h2>
+		<div class="row">
+			<div class="col-sm-8 col-md-6">
+				<form class="form" ng-submit="addHost(newHostname)">
+					<div class="input-group">
+						<input class="form-control" type="text" placeholder="hostname:port"
+							ng-model="newHostname"></input>
+						<div class="input-group-btn">
+							<input type="submit" class="btn btn-primary fa" title="Add {{ newHostname }}"
+								value="Add" ng-disabled="!newHostname" ng-click="addHost(newHostname)"></input>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

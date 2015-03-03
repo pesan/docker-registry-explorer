@@ -1,0 +1,46 @@
+<header class="hero-unit" id="banner">
+	<div class="container">
+		<h1>Docker Registry Explorer</h1>
+		<p class="lead">Enter the URL to a registry to start exploring</p>
+		<form ng-submit="browse(registryUrl)">
+			<div class="row">
+				<div class="col-sm-12 col-md-offset-3 col-md-6 text-center">
+					<div class="input-group">
+						<input
+							class="form-control"
+							type="text"
+							placeholder="Registry URL"
+							focus
+							ng-model="registryUrl"
+							typeahead="recent for recent in history|filter:$viewValue">
+						</input>
+						<span class="input-group-btn">
+							<button class="btn btn-default">Browse</button>
+						</span>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</header>
+
+<div class="container text-center">
+	<h2>Quickstart</h2>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="list-unstyled">
+				<li>
+					<a ui-sref="browse({ host: ['https://registry.hub.docker.com']})">
+						Browse official repository <i class="fa fa-angle-double-right"></i>
+					</a>
+				</li>
+				<li>
+					<a ui-sref="browse({ host: [host + ':5000']})">
+						Browse repository at {{ host }}:5000 <i class="fa fa-angle-double-right"></i>
+					</a>
+				</li>
+			</div>
+		</div>
+	</div>
+</div>
+

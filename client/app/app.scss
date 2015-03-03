@@ -1,0 +1,42 @@
+$icon-font-path: "/bower_components/bootstrap-sass-official/vendor/assets/fonts/bootstrap/";
+$fa-font-path: "/bower_components/font-awesome/fonts";
+
+@import 'font-awesome/scss/font-awesome';
+@import 'bootstrap-sass-official/vendor/assets/stylesheets/bootstrap';
+
+/**
+ * App-wide Styles
+ */
+
+.browsehappy {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+.fa-spin {
+	filter: blur(0);
+}
+
+.global-loading {
+	z-index: 999999999;
+	background-color: rgba(0,0,0,0.7);
+	position: fixed;
+	width: 100%;
+	top: 30%;
+	border-top: 2px solid #ccc;
+	border-bottom: 2px solid #ccc;
+}
+
+.global-loading div {
+	margin: 24px 0;
+	color: lightgray;
+	font-size: 24px;
+}
+
+// Component styles are injected through grunt
+// injector
+@import 'browse/browse.scss';
+@import 'main/main.scss';
+// endinjector
