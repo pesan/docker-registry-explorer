@@ -8,6 +8,7 @@ angular.module('registryExplorerApp', [
 	'ui.bootstrap',
 	'LocalStorageModule',
 ])
+.constant('OfficialRepository', 'registry.hub.docker.com')
 .controller('RootCtrl', function($scope, $rootScope, $timeout) {
 	$scope.timedLoading = false;
 	$scope.loading = false;

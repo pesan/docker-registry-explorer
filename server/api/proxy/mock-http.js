@@ -126,11 +126,12 @@ var fetchTags = function() {
 };
 
 module.exports = {
-	get: function(options, callback) {
+	request: function(options, callback) {
 		callback({
 			statusCode: 200,
 			headers: { 'content-type': 'application/json' },
 			on: function(trigger, callback) {
+				if (trigger !== 'error')
 				callback(
 					trigger === 'data' ?
 					JSON.stringify(options.path.indexOf('/tags') >= 0 ? fetchTags() : fetchImages(queryFromPath(options.path))) :
@@ -140,6 +141,7 @@ module.exports = {
 			},
 		});
 		return {
+			end: function() {},
 			on: function() { return this; },
 			setTimeout: function() { return this; },
 		};

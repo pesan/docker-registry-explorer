@@ -20,14 +20,16 @@ describe('Controller: MainCtrl', function () {
 		MainCtrl = $controller('MainCtrl', {
 			$scope: scope,
 			$state: state,
+			OfficialRepository: 'official.registry.com',
 			history: history,
 			host: 'localhost',
 		});
 	}));
 
-	it('should initialize history and host', function () {
+	it('should initialize', function () {
 		expect(scope.history).to.equal(history);
 		expect(scope.host).to.eql('localhost');
+		expect(scope.official).to.eql('official.registry.com');
 	});
 
 	it('should add browsed host to history', function () {
@@ -36,7 +38,11 @@ describe('Controller: MainCtrl', function () {
 	});
 
 	it('should change state to browse', function () {
-		scope.browse('newhost:1000');
-		expect(state.go).to.have.been.calledWith('browse', { host: 'newhost:1000'});
+		scope.browse('https://registry.example.com:8443');
+		expect(state.go).to.have.been.calledWith('browse', {
+			protocol: 'https',
+			hostname: 'registry.example.com',
+			port: 8443
+		});
 	});
 });

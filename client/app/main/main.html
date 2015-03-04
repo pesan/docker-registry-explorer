@@ -30,12 +30,12 @@
 		<div class="col-xs-12">
 			<div class="list-unstyled">
 				<li>
-					<a ui-sref="browse({ host: ['https://registry.hub.docker.com']})">
+					<a ui-sref="browse(toRegistry('https://' + official))">
 						Browse official repository <i class="fa fa-angle-double-right"></i>
 					</a>
 				</li>
 				<li>
-					<a ui-sref="browse({ host: [host + ':5000']})">
+					<a ui-sref="browse(toRegistry(host+':5000'))">
 						Browse repository at {{ host }}:5000 <i class="fa fa-angle-double-right"></i>
 					</a>
 				</li>

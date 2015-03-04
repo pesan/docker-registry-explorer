@@ -2,32 +2,21 @@
 
 angular.module('registryExplorerApp')
 .constant('pagerSize', 10)
-.controller('BrowseCtrl', function ($scope, $state, query, images, PageTag, pagerSize) {
-	$scope.query = query;
-	$scope.hosts = images;
-	$scope.hasHosts = !angular.equals({}, images);
+.controller('BrowseCtrl', function ($scope, $state, pagerSize, repository, registry, tags, state) {
+	$scope.registry = registry;
+	$scope.repository = repository;
+	$scope.tags = tags;
 	$scope.pagerSize = pagerSize;
-
-	$scope.addHost = function(hostname) {
-		$scope.hosts[hostname] = {};
-		$scope.restate();
-	};
-
-	$scope.removeHost = function(hostname) {
-		delete $scope.hosts[hostname];
-		$scope.restate();
-	};
+	$scope.query = state.query;
 
 	$scope.selectTag = function(image, newTag) {
 		image.tag = newTag;
 	};
 
 	$scope.restate = function(config) {
-		$state.go('browse', {
-			host: _.map($scope.hosts, function(host, hostname) {
-				return PageTag.stringify(hostname, (host._page || {}).current);
-			}),
+		$state.go('browse', _.assign({}, registry, {
+			page: $scope.repository.page,
 			query: $scope.query,
-		}, config);
+		}), config);
 	};
 });

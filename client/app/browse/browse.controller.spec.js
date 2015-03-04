@@ -7,39 +7,48 @@ describe('Controller: BrowseCtrl', function () {
 	var scope;
 	var state;
 
-	var hostLocal;
-	var hostExternal;
+	var repository;
+	var registry;
+	var tags;
 
 	beforeEach(inject(function ($controller, $rootScope) {
 		state = {
 			go: sinon.spy(),
 		};
 
-		hostLocal = createHost({
-			images: [{
-				name: 'test/img',
-				tags: ['latest', '1.0.3']
-			}],
-			page: 3,
-		});
+		tags = {
+			'dockerfile/debian': [
+				{ name: '6.0', layer: 'c5881f11' },
+				{ name: '6.1', layer: '195eb90b' },
+				{ name: '6.2', layer: '78949b1e' },
+			],
+			'dockerfile/fedora': [
+				{ name: 'latest', layer: '3db9c44f' },
+			],
+		};
 
-		hostExternal = createHost({
-			images: [{
-				name: 'official/img',
-				tags: ['latest', 'RC1']
-			}],
-			page: 11,
-		});
+		repository = {
+			images: [
+				{ name: 'dockerfile/debian', tag: _.first(tags['dockerfile/debian']) },
+				{ name: 'dockerfile/fedora', tag: _.first(tags['dockerfile/fedora']) },
+			],
+			page: 3,
+		};
+
+		registry = {
+			protocol: 'http',
+			hostname: 'registry.example.com',
+			port: 8080
+		};
 
 		scope = $rootScope.$new();
 		BrowseCtrl = $controller('BrowseCtrl', {
 			$scope: scope,
 			$state: state,
-			query: 'ubuntu',
-			images: {
-				'localhost:5000': hostLocal,
-				'external:8080': hostExternal,
-			},
+			state: { query: 'ubuntu', page: 3 },
+			repository: repository,
+			registry: registry,
+			tags: tags,
 			pagerSize: 5,
 		});
 	}));
@@ -47,56 +56,26 @@ describe('Controller: BrowseCtrl', function () {
 	it('should initialize', function() {
 		expect(scope.pagerSize).to.equal(5);
 		expect(scope.query).to.equal('ubuntu');
-		expect(_.keys(scope.hosts)).to.eql(['localhost:5000', 'external:8080']);
+		expect(scope.registry).to.equal(registry);
+		expect(scope.repository).to.equal(repository);
+		expect(scope.tags).to.equal(tags);
 	});
 
 	it('should switch tag on image when selecting tag', function() {
-		var image = _.first(hostLocal.images);
-		var tag = _.last(image.tags);
+		var image = _.first(repository.images);
+		var tag = _.last(tags[image.name]);
 		scope.selectTag(image, tag);
 		expect(image.tag).to.eql(tag);
 	});
 
-	it('should add and restate when hostname is added', function() {
-		scope.restate = sinon.spy();
-		scope.addHost('newhost:8080');
-		expect(scope.hosts).to.include.keys('newhost:8080');
-		expect(scope.restate).to.have.been.calledWith();
-	});
-
-	it('should remove and restate when hostname is removed', function() {
-		scope.restate = sinon.spy();
-		scope.removeHost('localhost:5000');
-		expect(scope.hosts).to.not.include.keys('localhost:5000');
-		expect(scope.restate).to.have.been.calledWith();
-	});
-
-	it('should restate using state.go', function() {
+	it('should restate with current state information', function() {
 		scope.restate();
 		expect(state.go).to.have.been.calledWith('browse', {
-			host: ['localhost:5000;3', 'external:8080;11'],
-			query: 'ubuntu'
+			protocol: 'http',
+			hostname: 'registry.example.com',
+			port: 8080,
+			query: 'ubuntu',
+			page: 3,
 		});
 	});
-
-	// Helpers
-
-	var createHost = function(conf) {
-		return {
-			images: _.map(conf.images, function(imageConfig) {
-				var image = {
-					name: imageConfig.name,
-					tags: _.map(imageConfig.tags, function(tagName) {
-						return {
-							name: tagName,
-							url: imageConfig.name + ':' + tagName,
-						};
-					}),
-				};
-				image.tag = _.first(image.tags);
-				return image;
-			}),
-			_page: { current: conf.page },
-		};
-	};
 });

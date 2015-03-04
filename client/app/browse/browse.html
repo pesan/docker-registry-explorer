@@ -25,24 +25,18 @@
 		</div>
 	</div>
 
-	<h1 ng-if="hasHosts">Images</h1>
-	<div ng-repeat="(hostname, host) in hosts">
-		<div class="btn-group pull-right">
-			<button class="btn btn-sm btn-default" title="Delete {{ hostname }}"
-				ng-click="removeHost(hostname)">
-				<i class="fa fa-trash"></i>
-			</button>
-		</div>
-		<table class="table table-condensed" ng-if="host.error || !host.images">
+	<h1>Images</h1>
+	<div>
+		<table class="table table-condensed" ng-if="registry.error || !repository.results">
 			<thead>
 				<tr>
 					<th>
 						<i class="fa fa-database"></i>
-						{{ hostname }}
+						{{ registry.hostname }}:{{ registry.port }}
 					</th>
-					<th ng-if="host.error">
+					<th ng-if="registry.error">
 						<button class="btn text-danger" title="Click to toggle error details"
-								ng-click="host.showError =! host.showError">
+								ng-click="registry.showError =! registry.showError">
 							<i class="fa fa-warning"></i>
 							<span class="hidden-xs hidden-sm">Unable to explore this registry</span>
 						</button>
@@ -50,16 +44,16 @@
 				</tr>
 			</thead>
 		</table>
-		<div class="text-center" ng-if="host.error">
-			<div collapse="!host.showError">
-				<pre class="text-left">{{ host.error }}</pre>
+		<div class="text-center" ng-if="registry.error">
+			<div collapse="!registry.showError">
+				<pre class="text-left">{{ registry.error }}</pre>
 			</div>
 		</div>
-		<table class="table table-condensed" ng-if="!host.error && host.images">
+		<table class="table table-condensed" ng-if="!registry.error && repository.results">
 			<thead>
 				<tr>
 					<th colspan="3">
-						<i class="fa fa-database"></i> {{ hostname }}
+						<i class="fa fa-database"></i> {{ registry.hostname }}:{{ registry.port }}
 					</th>
 				</tr>
 				<tr>
@@ -75,7 +69,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="image in host.images">
+				<tr ng-repeat="image in repository.results">
 					<td>
 						<code>{{ image.name }}</code>
 					</td>
@@ -85,7 +79,7 @@
 								class="tag btn label label-default"
 								ng-class="{'label-primary': image.tag.name==tag.name}"
 								ng-click="selectTag(image, tag)"
-								ng-repeat="tag in image.tags">
+								ng-repeat="tag in tags[image.name]">
 								{{ tag.name }}
 							</button>
 						</div>
@@ -99,12 +93,12 @@
 				<tr>
 					<td colspan="3">
 						<pagination
-							items-per-page="host._page.size"
-							total-items="host._page.total"
+							items-per-page="repository.page_size"
+							total-items="repository.num_results"
 							rotate="false"
 							boundary-links="true"
 							max-size="pagerSize"
-							ng-model="host._page.current"
+							ng-model="repository.page"
 							ng-change="restate()"
 							previous-text="&lsaquo;"
 							next-text="&rsaquo;"
@@ -115,22 +109,5 @@
 				</tr>
 			</tfoot>
 		</table>
-	</div>
-	<div>
-		<h2>Add registry</h2>
-		<div class="row">
-			<div class="col-sm-8 col-md-6">
-				<form class="form" ng-submit="addHost(newHostname)">
-					<div class="input-group">
-						<input class="form-control" type="text" placeholder="hostname:port"
-							ng-model="newHostname"></input>
-						<div class="input-group-btn">
-							<input type="submit" class="btn btn-primary fa" title="Add {{ newHostname }}"
-								value="Add" ng-disabled="!newHostname" ng-click="addHost(newHostname)"></input>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
 	</div>
 </div>

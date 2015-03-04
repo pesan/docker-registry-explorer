@@ -1,19 +1,27 @@
 'use strict';
 
 angular.module('registryExplorerApp')
-.factory('Image', function($resource, $http) {
-	return $resource('/api/images?q=:query&host=:host&page=:page', {page: 1}, {
+.factory('Repository', function($resource, $http) {
+	return $resource('/proxy/:protocol/:hostname/:port/v1/search?q=:query&page=:page', {protocol: 'http', port: '-', page: 1}, {
 		'query': {
 			method:'GET',
 			isArray: false,
 			transformResponse: $http.defaults.transformResponse.concat(function(data) {
-				if (data.error) {
-					return data.error;
+				return data;
+			}),
+		},
+	});
+})
+.factory('Tag', function($resource, $http) {
+	return $resource('/proxy/:protocol/:hostname/:port/v1/repositories/:name/tags', {protocol: 'http', port: '-'}, {
+		'query': {
+			method:'GET',
+			isArray: true,
+			transformResponse: $http.defaults.transformResponse.concat(function(data) {
+				if (!_.isArray(data)) {
+					return _.map(data, function(v, k) { return { name: k, layer: v }; });
 				}
-				_.forEach(data.images, function(image) {
-					image.tag = _.first(image.tags);
-				});
-				return { images: data.images, _page: data.page };
+				return data;
 			}),
 		},
 	});
