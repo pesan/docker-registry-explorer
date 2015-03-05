@@ -9,7 +9,7 @@ angular.module('registryExplorerApp', [
 	'LocalStorageModule',
 ])
 .constant('OfficialRepository', 'registry.hub.docker.com')
-.controller('RootCtrl', function($scope, $rootScope, $state, $timeout, ErrorModal) {
+.controller('RootCtrl', function($scope, $rootScope, $state, $timeout, errorModal) {
 	$scope.timedLoading = false;
 	$scope.loading = false;
 
@@ -29,7 +29,7 @@ angular.module('registryExplorerApp', [
 	$rootScope.$on('$stateChangeError', function(evt, toState, toArgs, fromState, fromArgs, cause) {
 		endLoading();
 
-		ErrorModal(cause.data.error.message, {
+		errorModal(cause.data.error.message, {
 			onTryAgain: function() {
 				$timeout(function () {
 					$state.go(toState.name, toArgs);

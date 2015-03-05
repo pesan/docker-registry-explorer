@@ -17,7 +17,7 @@ angular.module('registryExplorerApp')
 		$modalInstance.dismiss('cancel');
 	};
 })
-.service('ErrorModal', function($modal) {
+.service('errorModal', function($modal) {
 	return function(text, config) {
 		var hasCancel = !!config.onCancel;
 
