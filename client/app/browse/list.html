@@ -52,7 +52,7 @@
 		<table class="table table-condensed" ng-if="!registry.error && repository.results">
 			<thead>
 				<tr>
-					<th colspan="3">
+					<th colspan="4">
 						<i class="fa fa-database"></i> {{ registry.hostname }}:{{ registry.port }}
 					</th>
 				</tr>
@@ -65,6 +65,9 @@
 					</th>
 					<th>
 						<i class="fa fa-external-link"></i> URL
+					</th>
+					<th>
+						Layer
 					</th>
 				</tr>
 			</thead>
@@ -87,11 +90,15 @@
 					<td>
 						<code>{{ image.tag.url }}</code>
 					</td>
+					<td>
+						<imageid ng-if="!isOfficial" registry="registry" image="image.tag.layer" limit="8" />
+						<code ng-if="isOfficial" title="Cannot view layers in the official registry">{{ image.tag.layer }}</code>
+					</td>
 				</tr>
 			</tbody>
 			<tfoot>
 				<tr>
-					<td colspan="3">
+					<td colspan="4">
 						<pagination
 							items-per-page="repository.page_size"
 							total-items="repository.num_results"
@@ -105,7 +112,7 @@
 							first-text="&laquo;"
 							last-text="&raquo;">
 						</pagination>
-					</td> 
+					</td>
 				</tr>
 			</tfoot>
 		</table>

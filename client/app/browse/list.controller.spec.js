@@ -1,9 +1,9 @@
 'use strict';
 
-describe('Controller: BrowseCtrl', function () {
+describe('Controller: ListCtrl', function () {
 	beforeEach(module('registryExplorerApp'));
 
-	var BrowseCtrl;
+	var ListCtrl;
 	var scope;
 	var state;
 
@@ -42,7 +42,7 @@ describe('Controller: BrowseCtrl', function () {
 		};
 
 		scope = $rootScope.$new();
-		BrowseCtrl = $controller('BrowseCtrl', {
+		ListCtrl = $controller('ListCtrl', {
 			$scope: scope,
 			$state: state,
 			state: { query: 'ubuntu', page: 3 },
@@ -70,7 +70,7 @@ describe('Controller: BrowseCtrl', function () {
 
 	it('should restate with current state information', function() {
 		scope.restate();
-		expect(state.go).to.have.been.calledWith('browse', {
+		expect(state.go).to.have.been.calledWith('browse.list', {
 			protocol: 'http',
 			hostname: 'registry.example.com',
 			port: 8080,

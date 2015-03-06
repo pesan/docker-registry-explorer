@@ -1,0 +1,43 @@
+<div class="container">
+	<h1>Details</h1>
+	<tabset>
+		<tab heading="Summary">
+			<div style="border-top: none; border-radius: 0 0 4px 4px;" class="panel panel-default">
+				<table class="table table-condensed table-striped">
+					<thead>
+						<tr>
+							<th>Attribute</th>
+							<th>Value</th>
+						<tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="attribute in summaryAttributes">
+							<th>{{ attribute.text }}</th>
+							<td ng-if="!attribute.link || !attribute.value"><code>{{ attribute.value || 'N/A' }}</code></td>
+							<td ng-if="attribute.link && attribute.value"><imageid registry="registry" image="attribute.value"/></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</tab>
+		<tab heading="Full">
+			<div style="border-top: none; border-radius: 0 0 4px 4px;" class="panel panel-default">
+				<div class="panel-body">
+					<pre>{{ image|json }}</pre>
+				</div>
+			</div>
+		</tab>
+		<tab heading="History">
+			<div style="border-top: none; border-radius: 0 0 4px 4px;" class="panel panel-default">
+				<div class="list-group">
+					<div class="list-group-item" ng-repeat="ancestor in ancestry">
+						<imageid registry="registry" image="ancestor"/>
+						<span ng-if="$last" class="badge">root</span>
+						<span ng-if="ancestor===image.id" class="badge">this</span>
+						<span ng-if="ancestor===image.parent" class="badge">parent</span>
+					</div>
+				</div>
+			</div>
+		</tab>
+	</tabset>
+</div>

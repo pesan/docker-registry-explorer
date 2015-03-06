@@ -2,7 +2,8 @@
 
 angular.module('registryExplorerApp')
 .constant('pagerSize', 10)
-.controller('BrowseCtrl', function ($scope, $state, pagerSize, repository, registry, tags, state) {
+.controller('ListCtrl', function (officialHostname, $scope, $state, pagerSize, repository, registry, tags, state) {
+	$scope.isOfficial = (officialHostname === registry.hostname);
 	$scope.registry = registry;
 	$scope.repository = repository;
 	$scope.tags = tags;
@@ -14,7 +15,7 @@ angular.module('registryExplorerApp')
 	};
 
 	$scope.restate = function(config) {
-		$state.go('browse', _.assign({}, registry, {
+		$state.go('browse.list', _.assign({}, registry, {
 			page: $scope.repository.page,
 			query: $scope.query,
 		}), config);

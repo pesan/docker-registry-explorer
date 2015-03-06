@@ -136,7 +136,7 @@ module.exports = {
 					trigger === 'data' ?
 					JSON.stringify(options.path.indexOf('/tags') >= 0 ? fetchTags() : fetchImages(queryFromPath(options.path))) :
 					undefined);
-					
+
 				return this;
 			},
 		});

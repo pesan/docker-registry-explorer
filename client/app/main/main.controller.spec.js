@@ -4,7 +4,7 @@ describe('Controller: MainCtrl', function () {
 	beforeEach(module('registryExplorerApp'));
 
 	var MainCtrl;
-	var scope; 
+	var scope;
 	var state;
 	var history;
 
@@ -20,7 +20,7 @@ describe('Controller: MainCtrl', function () {
 		MainCtrl = $controller('MainCtrl', {
 			$scope: scope,
 			$state: state,
-			OfficialRepository: 'official.registry.com',
+			officialHostname: 'official.registry.com',
 			history: history,
 			host: 'localhost',
 		});
@@ -39,7 +39,7 @@ describe('Controller: MainCtrl', function () {
 
 	it('should change state to browse', function () {
 		scope.browse('https://registry.example.com:8443');
-		expect(state.go).to.have.been.calledWith('browse', {
+		expect(state.go).to.have.been.calledWith('browse.list', {
 			protocol: 'https',
 			hostname: 'registry.example.com',
 			port: 8443

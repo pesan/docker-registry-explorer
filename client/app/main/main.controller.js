@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('registryExplorerApp')
-.controller('MainCtrl', function (RegistryUrl, OfficialRepository, $scope, $state, host, history) {
+.controller('MainCtrl', function (RegistryUrl, officialHostname, $scope, $state, host, history) {
 	$scope.host = host;
 	$scope.history = history;
-	$scope.official = OfficialRepository;
+	$scope.official = officialHostname;
 
 	$scope.toRegistry = RegistryUrl.parse;
 
@@ -14,6 +14,6 @@ angular.module('registryExplorerApp')
 		}
 
 		$scope.history.add(registryUrl);
-		$state.go('browse', $scope.toRegistry(registryUrl));
+		$state.go('browse.list', $scope.toRegistry(registryUrl));
 	};
 });

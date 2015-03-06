@@ -40,7 +40,7 @@ var forwardRequest = function(req, res, target) {
 		}
 
 		res.setHeader('Content-Type', 'application/json');
-		
+
 		response.on('error', function(data) {
 			res.status(500).json(error(target, data.code + ' (' + data.errno + ')'));
 		});
