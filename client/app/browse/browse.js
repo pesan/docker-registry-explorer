@@ -91,9 +91,11 @@ angular.module('registryExplorerApp')
 			registry: '=',
 			limit: '=?',
 		},
-		link: function($scope) {
-			$scope.limit = $scope.limit || 64;
-			$scope.href = $state.href('browse.detail', _.assign({}, $scope.registry, { id: $scope.image }));
+		link: function(scope) {
+			scope.limit = scope.limit || 64;
+			scope.$watch('image', function() {
+				scope.href = $state.href('browse.detail', _.assign({}, scope.registry, { id: scope.image }));
+			});
 		},
 		template:
 			'<a class="image-id" href="{{ href }}">' +
