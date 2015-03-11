@@ -31,9 +31,9 @@ angular.module('registryExplorerApp')
 			'repository': function(Repository, registry, state) {
 				return Repository.query(_.assign({}, registry, state)).$promise;
 			},
-			'tags': function($q, RegistryUrl, Tag, repository, registry, state) {
+			'tags': function($q, RegistryUrl, Tag, repository, registry) {
 				return $q.all(_.zipObject(_.map(repository.results, 'name'), _.map(repository.results, function(image) {
-					return Tag.query(_.assign({}, registry, state, { name: image.name })).$promise.then(function(tags) {
+					return Tag.query(_.assign({}, registry, { name: image.name })).$promise.then(function(tags) {
 						image.tag = _.first(tags);
 						_.forEach(tags, function(tag) {
 							tag.url = RegistryUrl.stringifyTag(registry, image, tag);
