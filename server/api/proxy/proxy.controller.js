@@ -39,6 +39,8 @@ var forwardRequest = function(req, res, target) {
 			return;
 		}
 
+		res.status(response.statusCode);
+
 		res.setHeader('Content-Type', 'application/json');
 
 		response.on('error', function(data) {
@@ -48,7 +50,7 @@ var forwardRequest = function(req, res, target) {
 			res.write(data)
 		});
 		response.on('end', function() {
-			res.status(response.statusCode).end();
+			res.end();
 		});
 	});
 

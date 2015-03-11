@@ -103,11 +103,11 @@ var images = [
 { "name": "st2py/ubuntu", "description": "" },
 ];
 
-var queryFromPath = function(path) {
+var getQueryFromPath = function(path) {
 	return require('querystring').parse(path.substring(path.indexOf('?') + 1));
 };
 
-var fetchImages = function(queries) {
+var getImages = function(queries) {
 	var pageSize = queries.n || 25;
 	var results = _.filter(images, function(image) {
 		return image.name.indexOf(queries.q) >= 0;
@@ -121,29 +121,98 @@ var fetchImages = function(queries) {
 		'results': results.slice((queries.page - 1) * pageSize, queries.page * pageSize)
 	};
 };
-var fetchTags = function() {
-	return _.map([ 'latest', '1.0.1', '2.0.0' ], function(name) { return {name: name} });
+
+var getTags = function() {
+	return [
+		{ name: 'latest', layer: '10c37f0780ca1d1602fcb720b29b3542a2d24ea9' },
+		{ name: '1.0.1', layer: 'cfc5fe3a1d6f7e773eb019d04681697648d23e76' },
+		{ name: '2.0.0', layer: '3861a21803fcd9eb92a403027b0da2bb7add4de1' }
+	];
 };
 
-module.exports = {
-	request: function(options, callback) {
-		callback({
-			statusCode: 200,
-			headers: { 'content-type': 'application/json' },
-			on: function(trigger, callback) {
-				if (trigger !== 'error')
-				callback(
-					trigger === 'data' ?
-					JSON.stringify(options.path.indexOf('/tags') >= 0 ? fetchTags() : fetchImages(queryFromPath(options.path))) :
-					undefined);
-
-				return this;
-			},
-		});
-		return {
-			end: function() {},
-			on: function() { return this; },
-			setTimeout: function() { return this; },
-		};
-	},
+var getDetails = function(options, match) {
+	var id = match[1];
+	return {
+		'id': id,
+		'parent': '06a7195811199d4eaee18482fc151c2443cd73e0',
+		'created': '2011-01-01',
+		'architecture': 'amd64',
+		'os': 'linux',
+		'Size': 501,
+	};
 };
+
+var getAncestry = function() {
+	return [
+		'10c37f0780ca1d1602fcb720b29b3542a2d24ea9',
+		'cfc5fe3a1d6f7e773eb019d04681697648d23e76',
+		'3861a21803fcd9eb92a403027b0da2bb7add4de1',
+	];
+}
+
+var FakeClient = function() {
+	this.patterns = [];
+	this.defaultPattern = {
+		code: 404,
+		action: _.constant('Not found'),
+	};
+};
+
+FakeClient.prototype.request = function(options, callback) {
+	var match;
+	var pattern = _.find(this.patterns, function(pattern) {
+		return !!(match = options.path.match(pattern.match));
+	}) || this.defaultPattern;
+
+	callback({
+		statusCode: pattern.code,
+		headers: { 'content-type': 'application/json' },
+		on: function(trigger, callback) {
+			if (trigger === 'data') {
+				var data = JSON.stringify(pattern.action(options, match));
+				callback(data);
+			} else if (trigger === 'end') {
+				callback();
+			}
+			return this;
+		},
+	});
+	return {
+		end: function() { return this; },
+		on: function() { return this; },
+		setTimeout: function() { return this; },
+	};
+};
+
+var escapeRegex = function(text) {
+	return text.replace(/[.*+? ${}()|[\]\\]/g, '\\$&');
+};
+
+FakeClient.prototype.when = function(match) {
+	match = _.reduce(match.split('**'), function(a, b, c, d) {
+		return _.map(d, function(dd) {
+			return _.reduce(dd.split('*'), function(e1, e2, e3, e4) {
+				return _.map(e4, escapeRegex).join('([^/]+)');
+			});
+		}).join('(.*)');
+	}, '');
+	var self = this;
+	return {
+		then: function(response, code) {
+			self.patterns.push({
+				match: match,
+				code: code || 200,
+				action: _.isFunction(response) ? response : _.constant(response),
+			});
+			return self;
+		}
+	};
+};
+
+var mockClient = new FakeClient();
+
+module.exports = mockClient
+	.when('/v1/search*').then(function (options) { return getImages(getQueryFromPath(options.path)); })
+	.when('/v1/repositories/**/tags').then(getTags())
+	.when('/v1/images/*/json').then(getDetails)
+	.when('/v1/images/*/ancestry').then(getAncestry());
