@@ -64,4 +64,22 @@ angular.module('registryExplorerApp', [
             }
         };
     }
-);
+)
+.service('History', function(RegistryUrl, localStorageService, $location) {
+	var history = localStorageService.get('history') || [$location.host() + ':5000'];
+	var model = {
+		last: _.last(history),
+		all: history,
+		add: function(registry) {
+			var registryText = RegistryUrl.stringify(registry);
+			var index = history.indexOf(registryText);
+			if (index >= 0) {
+				history.splice(index, 1);
+			}
+			history.push(registryText);
+			localStorageService.set('history', history);
+			model.last = registryText;
+		},
+	};
+	return model;
+});

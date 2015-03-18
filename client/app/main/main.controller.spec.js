@@ -32,11 +32,6 @@ describe('Controller: MainCtrl', function () {
 		expect(scope.official).to.eql('official.registry.com');
 	});
 
-	it('should add browsed host to history', function () {
-		scope.browse('newhost:1000');
-		expect(history.add).to.have.been.calledWith('newhost:1000');
-	});
-
 	it('should change state to browse', function () {
 		scope.browse('https://registry.example.com:8443');
 		expect(state.go).to.have.been.calledWith('browse.list', {

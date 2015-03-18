@@ -2,13 +2,17 @@
 
 angular.module('registryExplorerApp')
 .constant('pagerSize', 10)
-.controller('ListCtrl', function (officialHostname, $scope, $state, pagerSize, repository, registry, tags, state) {
+.controller('ListCtrl', function (History, officialHostname, $scope, $state, pagerSize, repository, registry, tags, state) {
 	$scope.isOfficial = (officialHostname === registry.hostname);
 	$scope.registry = registry;
 	$scope.repository = repository;
 	$scope.tags = tags;
 	$scope.pagerSize = pagerSize;
 	$scope.query = state.query;
+
+	$scope.$on('$stateChangeSuccess', function() {
+		History.add(registry);
+	});
 
 	$scope.selectTag = function(image, newTag) {
 		image.tag = newTag;

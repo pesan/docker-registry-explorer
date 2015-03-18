@@ -7,6 +7,7 @@ describe('Controller: ListCtrl', function () {
 	var scope;
 	var state;
 
+	var History;
 	var repository;
 	var registry;
 	var tags;
@@ -14,6 +15,10 @@ describe('Controller: ListCtrl', function () {
 	beforeEach(inject(function ($controller, $rootScope) {
 		state = {
 			go: sinon.spy(),
+		};
+
+		History = {
+			add: sinon.spy(),
 		};
 
 		tags = {
@@ -41,10 +46,13 @@ describe('Controller: ListCtrl', function () {
 			port: 8080
 		};
 
+
 		scope = $rootScope.$new();
+		scope.$on = sinon.spy();
 		ListCtrl = $controller('ListCtrl', {
 			$scope: scope,
 			$state: state,
+			History: History,
 			state: { query: 'ubuntu', page: 3 },
 			repository: repository,
 			registry: registry,
@@ -66,6 +74,14 @@ describe('Controller: ListCtrl', function () {
 		var tag = _.last(tags[image.name]);
 		scope.selectTag(image, tag);
 		expect(image.tag).to.eql(tag);
+	});
+
+	it('should add current registry to history when state has been changed', function() {
+		expect(scope.$on).to.have.been.calledWith('$stateChangeSuccess', sinon.match(function (stateChangeSuccess) {
+			stateChangeSuccess();
+			expect(History.add).to.have.been.calledWith(registry);
+			return true;
+		}));
 	});
 
 	it('should restate with current state information', function() {

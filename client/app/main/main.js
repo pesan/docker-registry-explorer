@@ -11,15 +11,8 @@ angular.module('registryExplorerApp')
 				'host': function($location) {
 					return $location.host();
 				},
-				'history': function(localStorageService) {
-					var list = localStorageService.get('history') || [];
-					list.add = function(entity) {
-						if (this.indexOf(entity) < 0) {
-							this.push(entity);
-						}
-						localStorageService.set('history', this);
-					};
-					return list;
+				'history': function(History) {
+					return History.all;
 				}
 			},
 		});

@@ -13,7 +13,6 @@ angular.module('registryExplorerApp')
 			return;
 		}
 
-		$scope.history.add(registryUrl);
 		$state.go('browse.list', $scope.toRegistry(registryUrl));
 	};
 });
