@@ -28,6 +28,15 @@ module.exports = function (grunt) {
 
     // Project settings
     pkg: grunt.file.readJSON('package.json'),
+
+    'git-rev-parse': {
+      build: {
+        options: {
+          prop: 'git.revision',
+          number: 40
+        }
+      }
+    },
     yeoman: {
       // configurable paths
       client: require('./bower.json').appPath || 'client',
@@ -651,6 +660,7 @@ module.exports = function (grunt) {
     'concat',
     'ngAnnotate',
     'copy:dist',
+    'version',
     'cdnify',
     'cssmin',
     'uglify',
@@ -663,4 +673,15 @@ module.exports = function (grunt) {
     'test',
     'build'
   ]);
+
+  grunt.registerTask('version', [
+    'git-rev-parse',
+	'revision-file'
+  ]);
+  grunt.registerTask('revision-file', '', function() {
+    grunt.file.write('dist/public/version.json', JSON.stringify({
+      version: grunt.config('pkg.version'),
+      revision: grunt.config('git.revision')
+    }));
+  });
 };

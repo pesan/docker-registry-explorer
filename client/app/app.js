@@ -9,9 +9,10 @@ angular.module('registryExplorerApp', [
 	'LocalStorageModule',
 ])
 .constant('officialHostname', 'registry.hub.docker.com')
-.controller('RootCtrl', function($scope, $rootScope, $state, $timeout, errorModal) {
+.controller('RootCtrl', function($scope, $rootScope, $state, $timeout, errorModal, Version) {
 	$scope.timedLoading = false;
 	$scope.loading = false;
+	$scope.version = Version.query();
 
 	var beginLoading = function() {
 		$scope.timedLoading = true;
