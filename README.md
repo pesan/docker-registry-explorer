@@ -18,7 +18,7 @@ Simple Registry Explorer for Docker containers.
 
 ### Run from official Docker image
  1. Execute `docker run -it --rm -p 8080:8080 pesan/registry-explorer:1.0`.
- 2. Visit [http://localhost:9000](http://localhost:9000).
+ 2. Visit [http://localhost:8080](http://localhost:8080).
 
 ### Building and running using Grunt
  1. Execute `bower install`.
