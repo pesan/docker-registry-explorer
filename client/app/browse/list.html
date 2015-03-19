@@ -36,7 +36,7 @@
 					</th>
 					<th ng-if="registry.error">
 						<button class="btn text-danger" title="Click to toggle error details"
-								ng-click="registry.showError =! registry.showError">
+								ng-click="registry.showError = !registry.showError">
 							<i class="fa fa-warning"></i>
 							<span class="hidden-xs hidden-sm">Unable to explore this registry</span>
 						</button>
@@ -91,7 +91,7 @@
 						<code>{{ image.tag.url }}</code>
 					</td>
 					<td>
-						<imageid ng-if="!isOfficial" registry="registry" image="image.tag.layer" limit="8" />
+						<imageid ng-if="!isOfficial" registry="registry" image="image.tag.layer" limit="8"></imageid>
 						<code ng-if="isOfficial" title="Cannot view layers in the official registry">{{ image.tag.layer }}</code>
 					</td>
 				</tr>

@@ -5,7 +5,7 @@ angular.module('registryExplorerApp')
 	$stateProvider
 	.state('browse', {
 		abstract: true,
-		template: '<ui-view/>',
+		template: '<ui-view></ui-view>',
 		url: '/browse/{protocol:(?:http|https)}/:hostname/{port:int}',
 		resolve: {
 			'registry': function($stateParams) {
