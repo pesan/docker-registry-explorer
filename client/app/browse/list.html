@@ -82,13 +82,13 @@
 			<tbody>
 				<tr ng-repeat="image in repository.results">
 					<td>
-						<code>{{ image.name }}</code>
+						<code>{{ image.fullName }}</code>
 					</td>
 					<td>
 						<ul class="list-inline">
 							<li
 								class="label label-default tag"
-								ng-repeat="tag in tags[image.name]"
+								ng-repeat="tag in tags[image.fullName]"
 								ng-class="{'label-primary': image.tag.name == tag.name && !deleting, 'label-danger': deleting}">
 
 								<button
@@ -98,7 +98,7 @@
 								</button>
 								<button
 									class="btn btn-xs"
-									title="Delete tag {{ image.name }}:{{ tag.name }}"
+									title="Delete tag {{ image.fullName }}:{{ tag.name }}"
 									ng-if="deleting"
 									ng-click="deleteTag(image, tag)">
 									<strong>&times;</strong>

@@ -16,9 +16,9 @@ angular.module('registryExplorerApp')
 	});
 
 	$scope.deleteTag = function(image, tag) {
-		Tag.delete(_.assign({}, registry, {name: image.name, tag: tag.name}), function() {
-			tags[image.name] = _.without(tags[image.name], tag);
-			image.tag = _.first(tags[image.name]);
+		Tag.delete(_.assign({}, registry, {namespace: image.namespace, name: image.name, tag: tag.name}), function() {
+			tags[image.fullName] = _.without(tags[image.fullName], tag);
+			image.tag = _.first(tags[image.fullName]);
 		}, function(error) {
 			errorModal(error.data.error, {
 				onTryAgain: function() {

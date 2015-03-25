@@ -32,8 +32,8 @@ angular.module('registryExplorerApp')
 				return Repository.query(_.assign({}, registry, state)).$promise;
 			},
 			'tags': function($q, RegistryUrl, Tag, repository, registry) {
-				return $q.all(_.zipObject(_.map(repository.results, 'name'), _.map(repository.results, function(image) {
-					return Tag.query(_.assign({}, registry, { name: image.name })).$promise.then(function(tags) {
+				return $q.all(_.zipObject(_.map(repository.results, 'fullName'), _.map(repository.results, function(image) {
+					return Tag.query(_.assign({}, registry, { namespace: image.namespace, name: image.name })).$promise.then(function(tags) {
 						image.tag = _.first(tags);
 						_.forEach(tags, function(tag) {
 							tag.url = RegistryUrl.stringifyTag(registry, image, tag);
@@ -79,7 +79,7 @@ angular.module('registryExplorerApp')
 		},
 		stringifyTag: function(registry, image, tag) {
 			var isOfficial = (registry.hostname === officialHostname);
-			return (isOfficial ? '' : (registry.hostname + ':' + registry.port) + '/') + image.name + ':' + tag.name;
+			return (isOfficial ? '' : (registry.hostname + ':' + registry.port) + '/') + image.fullName + ':' + tag.name;
 		},
 	};
 })
