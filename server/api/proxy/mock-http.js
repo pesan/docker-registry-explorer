@@ -161,7 +161,7 @@ var FakeClient = function() {
 FakeClient.prototype.request = function(options, callback) {
 	var match;
 	var pattern = _.find(this.patterns, function(pattern) {
-		return !!(match = options.path.match(pattern.match));
+		return !!(match = options.path.match(pattern.match)) && options.method.indexOf(pattern.method) >= 0;
 	}) || this.defaultPattern;
 
 	callback({
@@ -188,7 +188,8 @@ var escapeRegex = function(text) {
 	return text.replace(/[.*+? ${}()|[\]\\]/g, '\\$&');
 };
 
-FakeClient.prototype.when = function(match) {
+FakeClient.prototype.when = function(match, method) {
+	method = method || 'GET';
 	match = _.reduce(match.split('**'), function(a, b, c, d) {
 		return _.map(d, function(dd) {
 			return _.reduce(dd.split('*'), function(e1, e2, e3, e4) {
@@ -201,6 +202,7 @@ FakeClient.prototype.when = function(match) {
 		then: function(response, code) {
 			self.patterns.push({
 				match: match,
+				method: _.isArray(method) ? method : [method],
 				code: code || 200,
 				action: _.isFunction(response) ? response : _.constant(response),
 			});
@@ -214,5 +216,7 @@ var mockClient = new FakeClient();
 module.exports = mockClient
 	.when('/v1/search*').then(function (options) { return getImages(getQueryFromPath(options.path)); })
 	.when('/v1/repositories/**/tags').then(getTags())
+	.when('/v1/repositories/**/tags/*', 'DELETE').then(_.identity)
+	.when('/v1/repositories/**', 'DELETE').then(_.identity)
 	.when('/v1/images/*/json').then(getDetails)
 	.when('/v1/images/*/ancestry').then(getAncestry());

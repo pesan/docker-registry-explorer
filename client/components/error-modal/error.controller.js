@@ -1,8 +1,9 @@
 'use strict';
 
 angular.module('registryExplorerApp')
-.controller('ErrorCtrl', function ($scope, $modalInstance, text, showCancel) {
+.controller('ErrorCtrl', function ($scope, $modalInstance, text, showHome, showCancel) {
 	$scope.text = text;
+	$scope.showHome = showHome;
 	$scope.showCancel = showCancel;
 
 	$scope.tryAgain = function() {
@@ -19,6 +20,7 @@ angular.module('registryExplorerApp')
 })
 .service('errorModal', function($modal) {
 	return function(text, config) {
+		var hasHome = !!config.onHome;
 		var hasCancel = !!config.onCancel;
 
 		var modalInstance = $modal.open({
@@ -27,6 +29,7 @@ angular.module('registryExplorerApp')
 			size: 'lg',
 			resolve: {
 				text: _.constant(text),
+				showHome: _.constant(hasHome),
 				showCancel: _.constant(hasCancel),
 			}
 		});

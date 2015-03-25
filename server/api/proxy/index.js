@@ -5,6 +5,6 @@ var controller = require('./proxy.controller');
 
 var router = express.Router();
 
-router.get('/:protocol/:hostname/:port/*', controller.index);
+router.all('/:protocol/:hostname/:port/*', controller.index);
 
 module.exports = router;

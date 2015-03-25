@@ -1,6 +1,14 @@
 <div class="container">
 	<h1>
 		<div class="btn-group pull-right">
+			<button
+				class="btn btn-sm btn-default"
+				title="Toggle delete tag mode"
+				ng-hide="isOfficial"
+				ng-class="{'active btn-danger': deleting}"
+				ng-click="deleting = !deleting">
+				<i class="fa fa-trash"></i>
+			</button>
 			<button class="btn btn-sm btn-default" title="Refresh"
 				ng-click="restate({ reload: true })">
 				<i class="fa fa-refresh"></i>
@@ -77,22 +85,36 @@
 						<code>{{ image.name }}</code>
 					</td>
 					<td>
-						<div class="list-inline">
-							<button
-								class="tag btn label label-default"
-								ng-class="{'label-primary': image.tag.name==tag.name}"
-								ng-click="selectTag(image, tag)"
-								ng-repeat="tag in tags[image.name]">
-								{{ tag.name }}
-							</button>
-						</div>
+						<ul class="list-inline">
+							<li
+								class="label label-default tag"
+								ng-repeat="tag in tags[image.name]"
+								ng-class="{'label-primary': image.tag.name == tag.name && !deleting, 'label-danger': deleting}">
+
+								<button
+									class="btn btn-xs"
+									ng-click="selectTag(image, tag)">
+									{{ tag.name }}
+								</button>
+								<button
+									class="btn btn-xs"
+									title="Delete tag {{ image.name }}:{{ tag.name }}"
+									ng-if="deleting"
+									ng-click="deleteTag(image, tag)">
+									<strong>&times;</strong>
+								</button>
+							</li>
+						</ul>
+						<span class="text-muted" ng-if="!image.tag">&ndash;</span>
 					</td>
 					<td>
-						<code>{{ image.tag.url }}</code>
+						<code ng-if="image.tag">{{ image.tag.url }}</code>
+						<span class="text-muted" ng-if="!image.tag">&ndash;</span>
 					</td>
 					<td>
-						<imageid ng-if="!isOfficial" registry="registry" image="image.tag.layer" limit="8"></imageid>
-						<code ng-if="isOfficial" title="Cannot view layers in the official registry">{{ image.tag.layer }}</code>
+						<imageid ng-if="!isOfficial && image.tag" registry="registry" image="image.tag.layer" limit="8"></imageid>
+						<code ng-if="isOfficial && image.tag" title="Cannot view layers in the official registry">{{ image.tag.layer }}</code>
+						<span class="text-muted" ng-if="!image.tag">&ndash;</span>
 					</td>
 				</tr>
 			</tbody>

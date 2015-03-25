@@ -29,6 +29,10 @@ angular.module('registryExplorerApp')
 				return data;
 			}),
 		},
+		'delete': {
+			url: '/proxy/:protocol/:hostname/:port/v1/repositories/:name/tags/:tag',
+			method:'DELETE',
+		},
 	});
 })
 .factory('Ancestry', function($resource) {

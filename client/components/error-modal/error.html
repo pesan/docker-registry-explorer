@@ -7,6 +7,6 @@
 </div>
 <div class="modal-footer">
 	<button class="btn btn-primary" ng-click="tryAgain()"><i class="fa fa-refresh"></i> Try again</button>
-	<button class="btn btn-warning" ng-click="home()"><i class="fa fa-home"></i> Home</button>
+	<button class="btn btn-warning" ng-click="home()" ng-if="showHome"><i class="fa fa-home"></i> Home</button>
 	<button class="btn btn-info" ng-click="cancel()" ng-if="showCancel">Cancel</button>
 </div>
