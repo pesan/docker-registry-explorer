@@ -3,7 +3,7 @@
 		<div class="btn-group pull-right">
 			<button
 				class="btn btn-sm btn-default"
-				title="Toggle delete tag mode"
+				title="Toggle delete mode"
 				ng-hide="isOfficial"
 				ng-class="{'active btn-danger': deleting}"
 				ng-click="deleting = !deleting">
@@ -83,6 +83,13 @@
 				<tr ng-repeat="image in repository.results">
 					<td>
 						<code>{{ image.fullName }}</code>
+						<button
+							class="btn btn-xs btn-danger"
+							title="Delete repository {{ image.fullName }}"
+							ng-if="deleting"
+							ng-click="deleteImage(image)">
+							<strong>&times;</strong>
+						</button>
 					</td>
 					<td>
 						<ul class="list-inline">

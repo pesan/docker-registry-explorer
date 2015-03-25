@@ -2,7 +2,7 @@
 
 angular.module('registryExplorerApp')
 .constant('pagerSize', 10)
-.controller('ListCtrl', function (Tag, History, officialHostname, $scope, $state, pagerSize, repository, registry, tags, state, errorModal) {
+.controller('ListCtrl', function (Tag, Repository, History, officialHostname, $scope, $state, pagerSize, repository, registry, tags, state, errorModal) {
 	$scope.isOfficial = (officialHostname === registry.hostname);
 	$scope.registry = registry;
 	$scope.repository = repository;
@@ -14,6 +14,19 @@ angular.module('registryExplorerApp')
 	$scope.$on('$stateChangeSuccess', function() {
 		History.add(registry);
 	});
+
+	$scope.deleteImage = function(image) {
+		Repository.delete(_.assign({}, registry, {namespace: image.namespace, name: image.name}), function() {
+			$scope.restate({reload: true});
+		}, function(error) {
+			errorModal(error.data.error, {
+				onTryAgain: function() {
+					$scope.deleteImage(image);
+				},
+				onCancel: function() {}
+			});
+		});
+	};
 
 	$scope.deleteTag = function(image, tag) {
 		Tag.delete(_.assign({}, registry, {namespace: image.namespace, name: image.name, tag: tag.name}), function() {

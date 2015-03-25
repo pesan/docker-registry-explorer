@@ -50,6 +50,9 @@ angular.module('registryExplorerApp', [
 .config(function (localStorageServiceProvider) {
 	localStorageServiceProvider.setPrefix('registry-explorer');
 })
+.config(function ($resourceProvider) {
+	$resourceProvider.defaults.stripTrailingSlashes = false;
+})
 .directive('focus',
     function($timeout) {
         return {
