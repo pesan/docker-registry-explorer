@@ -19,7 +19,7 @@
 	<div class="row">
 		<div class="col-sm-8 col-md-6">
 			<form class="form" ng-submit="restate()">
-				<label class="sr-only" for="query">Image name</label>
+				<label class="sr-only" for="query">Repository name</label>
 				<div class="input-group">
 					<input type="text" id="query" size="40" placeholder="Search terms"
 						class="form-control has-extension" ng-model="query" focus="!query"></input>
@@ -33,9 +33,9 @@
 		</div>
 	</div>
 
-	<h1>Images</h1>
+	<h1>Repositories</h1>
 	<div>
-		<table class="table table-condensed" ng-if="registry.error || !repository.results">
+		<table class="table table-condensed" ng-if="registry.error || !repositories.results">
 			<thead>
 				<tr>
 					<th>
@@ -57,7 +57,7 @@
 				<pre class="text-left">{{ registry.error }}</pre>
 			</div>
 		</div>
-		<table class="table table-condensed" ng-if="!registry.error && repository.results">
+		<table class="table table-condensed" ng-if="!registry.error && repositories.results">
 			<thead>
 				<tr>
 					<th colspan="4">
@@ -66,7 +66,7 @@
 				</tr>
 				<tr>
 					<th>
-						Image name
+						Repository name
 					</th>
 					<th>
 						<i class="fa fa-tag"></i> Tags
@@ -80,14 +80,14 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="image in repository.results">
+				<tr ng-repeat="repository in repositories.results">
 					<td>
-						<code>{{ image.fullName }}</code>
+						<code>{{ repository.fullName }}</code>
 						<button
 							class="btn btn-xs btn-danger"
-							title="Delete repository {{ image.fullName }}"
+							title="Delete repository {{ repository.fullName }}"
 							ng-if="deleting"
-							ng-click="deleteImage(image)">
+							ng-click="deleteRepository(repository)">
 							<strong>&times;</strong>
 						</button>
 					</td>
@@ -95,33 +95,33 @@
 						<ul class="list-inline">
 							<li
 								class="label label-default tag"
-								ng-repeat="tag in tags[image.fullName]"
-								ng-class="{'label-primary': image.tag.name == tag.name && !deleting, 'label-danger': deleting}">
+								ng-repeat="tag in tags[repository.fullName]"
+								ng-class="{'label-primary': repository.tag.name == tag.name && !deleting, 'label-danger': deleting}">
 
 								<button
 									class="btn btn-xs"
-									ng-click="selectTag(image, tag)">
+									ng-click="selectTag(repository, tag)">
 									{{ tag.name }}
 								</button>
 								<button
 									class="btn btn-xs"
-									title="Delete tag {{ image.fullName }}:{{ tag.name }}"
+									title="Delete tag {{ repository.fullName }}:{{ tag.name }}"
 									ng-if="deleting"
-									ng-click="deleteTag(image, tag)">
+									ng-click="deleteTag(repository, tag)">
 									<strong>&times;</strong>
 								</button>
 							</li>
 						</ul>
-						<span class="text-muted" ng-if="!image.tag">&ndash;</span>
+						<span class="text-muted" ng-if="!repository.tag">&ndash;</span>
 					</td>
 					<td>
-						<code ng-if="image.tag">{{ image.tag.url }}</code>
-						<span class="text-muted" ng-if="!image.tag">&ndash;</span>
+						<code ng-if="repository.tag">{{ repository.tag.url }}</code>
+						<span class="text-muted" ng-if="!repository.tag">&ndash;</span>
 					</td>
 					<td>
-						<imageid ng-if="!isOfficial && image.tag" registry="registry" image="image.tag.layer" limit="8"></imageid>
-						<code ng-if="isOfficial && image.tag" title="Cannot view layers in the official registry">{{ image.tag.layer }}</code>
-						<span class="text-muted" ng-if="!image.tag">&ndash;</span>
+						<imageid ng-if="!isOfficial && repository.tag" registry="registry" image="repository.tag.layer" limit="8"></imageid>
+						<code ng-if="isOfficial && repository.tag" title="Cannot view layers in the official registry">{{ repository.tag.layer }}</code>
+						<span class="text-muted" ng-if="!repository.tag">&ndash;</span>
 					</td>
 				</tr>
 			</tbody>
@@ -129,12 +129,12 @@
 				<tr>
 					<td colspan="4">
 						<pagination
-							items-per-page="repository.page_size"
-							total-items="repository.num_results"
+							items-per-page="repositories.page_size"
+							total-items="repositories.num_results"
 							rotate="false"
 							boundary-links="true"
 							max-size="pagerSize"
-							ng-model="repository.page"
+							ng-model="repositories.page"
 							ng-change="restate()"
 							previous-text="&lsaquo;"
 							next-text="&rsaquo;"

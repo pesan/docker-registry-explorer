@@ -2,10 +2,10 @@
 
 angular.module('registryExplorerApp')
 .constant('pagerSize', 10)
-.controller('ListCtrl', function (Tag, Repository, History, officialHostname, $scope, $state, pagerSize, repository, registry, tags, state, errorModal) {
+.controller('ListCtrl', function (Tag, Repository, History, officialHostname, $scope, $state, pagerSize, repositories, registry, tags, state, errorModal) {
 	$scope.isOfficial = (officialHostname === registry.hostname);
 	$scope.registry = registry;
-	$scope.repository = repository;
+	$scope.repositories = repositories;
 	$scope.tags = tags;
 	$scope.pagerSize = pagerSize;
 	$scope.query = state.query;
@@ -15,40 +15,40 @@ angular.module('registryExplorerApp')
 		History.add(registry);
 	});
 
-	$scope.deleteImage = function(image) {
-		Repository.delete(_.assign({}, registry, {namespace: image.namespace, name: image.name}), function() {
+	$scope.deleteRepository = function(repository) {
+		Repository.delete(_.assign({}, registry, {namespace: repository.namespace, name: repository.name}), function() {
 			$scope.restate({reload: true});
 		}, function(error) {
 			errorModal(error.data.error, {
 				onTryAgain: function() {
-					$scope.deleteImage(image);
+					$scope.deleteRepository(repository);
 				},
 				onCancel: function() {}
 			});
 		});
 	};
 
-	$scope.deleteTag = function(image, tag) {
-		Tag.delete(_.assign({}, registry, {namespace: image.namespace, name: image.name, tag: tag.name}), function() {
-			tags[image.fullName] = _.without(tags[image.fullName], tag);
-			image.tag = _.first(tags[image.fullName]);
+	$scope.deleteTag = function(repository, tag) {
+		Tag.delete(_.assign({}, registry, {namespace: repository.namespace, name: repository.name, tag: tag.name}), function() {
+			tags[repository.fullName] = _.without(tags[repository.fullName], tag);
+			repository.tag = _.first(tags[repository.fullName]);
 		}, function(error) {
 			errorModal(error.data.error, {
 				onTryAgain: function() {
-					$scope.deleteTag(image, tag);
+					$scope.deleteTag(repository, tag);
 				},
 				onCancel: function() {}
 			});
 		});
 	};
 
-	$scope.selectTag = function(image, newTag) {
-		image.tag = newTag;
+	$scope.selectTag = function(repository, newTag) {
+		repository.tag = newTag;
 	};
 
 	$scope.restate = function(config) {
 		$state.go('browse.list', _.assign({}, registry, {
-			page: $scope.repository.page,
+			page: $scope.repositories.page,
 			query: $scope.query,
 		}), config);
 	};

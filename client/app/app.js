@@ -43,7 +43,7 @@ angular.module('registryExplorerApp', [
 		});
 	});
 })
-.config(function ($stateProvider, $urlRouterProvider, $locationProvider) {
+.config(function ($urlRouterProvider, $locationProvider) {
 	$urlRouterProvider.otherwise('/');
 	$locationProvider.html5Mode(true);
 })

@@ -8,7 +8,7 @@ describe('Controller: ListCtrl', function () {
 	var state;
 
 	var History;
-	var repository;
+	var repositories;
 	var registry;
 	var tags;
 
@@ -32,8 +32,8 @@ describe('Controller: ListCtrl', function () {
 			],
 		};
 
-		repository = {
-			images: [
+		repositories = {
+			results: [
 				{ name: 'dockerfile/debian', tag: _.first(tags['dockerfile/debian']) },
 				{ name: 'dockerfile/fedora', tag: _.first(tags['dockerfile/fedora']) },
 			],
@@ -46,7 +46,6 @@ describe('Controller: ListCtrl', function () {
 			port: 8080
 		};
 
-
 		scope = $rootScope.$new();
 		scope.$on = sinon.spy();
 		ListCtrl = $controller('ListCtrl', {
@@ -54,7 +53,7 @@ describe('Controller: ListCtrl', function () {
 			$state: state,
 			History: History,
 			state: { query: 'ubuntu', page: 3 },
-			repository: repository,
+			repositories: repositories,
 			registry: registry,
 			tags: tags,
 			pagerSize: 5,
@@ -65,15 +64,15 @@ describe('Controller: ListCtrl', function () {
 		expect(scope.pagerSize).to.equal(5);
 		expect(scope.query).to.equal('ubuntu');
 		expect(scope.registry).to.equal(registry);
-		expect(scope.repository).to.equal(repository);
+		expect(scope.repositories).to.equal(repositories);
 		expect(scope.tags).to.equal(tags);
 	});
 
-	it('should switch tag on image when selecting tag', function() {
-		var image = _.first(repository.images);
-		var tag = _.last(tags[image.name]);
-		scope.selectTag(image, tag);
-		expect(image.tag).to.eql(tag);
+	it('should switch tag on repository when selecting tag', function() {
+		var repository = _.first(repositories.results);
+		var tag = _.last(tags[repository.name]);
+		scope.selectTag(repository, tag);
+		expect(repository.tag).to.eql(tag);
 	});
 
 	it('should add current registry to history when state has been changed', function() {
