@@ -82,7 +82,9 @@
 			<tbody>
 				<tr ng-repeat="repository in repositories.results">
 					<td>
-						<code>{{ repository.fullName }}</code>
+						<code>
+							<context-search keyword="repository.namespace" registry="registry"></context-search>/<context-search keyword="repository.name" registry="registry"></context-search>
+						</code>
 						<button
 							class="btn btn-xs btn-danger"
 							title="Delete repository {{ repository.fullName }}"

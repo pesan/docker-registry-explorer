@@ -83,6 +83,22 @@ angular.module('registryExplorerApp')
 		},
 	};
 })
+.directive('contextSearch', function() {
+	return {
+		restrict: 'E',
+		scope: {
+			keyword: '=',
+			registry: '=',
+		},
+		link: function(scope) {
+			scope.data = _.assign({}, scope.registry, { query: scope.keyword, page: 1 });
+		},
+		template:
+			'<a ui-sref="browse.list(data)" class="btn btn-xs context-keyword" title="Search for \'{{ keyword }}\'">' +
+			'{{ keyword }}' +
+			'</a>'
+	};
+})
 .directive('imageid', function($state) {
 	return {
 		restrict: 'E',
