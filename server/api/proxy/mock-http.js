@@ -1,6 +1,6 @@
 var _ = require('lodash');
 
-var images = [
+var repositories = [
 { "name": "kjunine/ubuntu", "description": "Docker for Ubuntu Trusty" },
 { "name": "partlab/ubuntu-elasticsearch", "description": "Docker image to run an out of the box Elasticsearch." },
 { "name": "pmdevel/ubuntu", "description": "Ubuntu 14.04 with character set ISO-8859-15" },
@@ -103,14 +103,20 @@ var images = [
 { "name": "st2py/ubuntu", "description": "" },
 ];
 
+var tags = _.zipObject(_.map(repositories, 'name'), _.map(repositories, _.constant([
+	{ name: 'latest', layer: '10c37f0780ca1d1602fcb720b29b3542a2d24ea9' },
+	{ name: '1.0.1', layer: 'cfc5fe3a1d6f7e773eb019d04681697648d23e76' },
+	{ name: '2.0.0', layer: '3861a21803fcd9eb92a403027b0da2bb7add4de1' }
+])));
+
 var getQueryFromPath = function(path) {
 	return require('querystring').parse(path.substring(path.indexOf('?') + 1));
 };
 
-var getImages = function(queries) {
+var getRepositories = function(queries) {
 	var pageSize = queries.n || 25;
-	var results = _.filter(images, function(image) {
-		return image.name.indexOf(queries.q) >= 0;
+	var results = _.filter(repositories, function(repository) {
+		return repository.name.indexOf(queries.q) >= 0;
 	});
 	return {
 		'num_pages': Math.ceil(results.length/pageSize),
@@ -120,14 +126,6 @@ var getImages = function(queries) {
 		'page': queries.page,
 		'results': results.slice((queries.page - 1) * pageSize, queries.page * pageSize)
 	};
-};
-
-var getTags = function() {
-	return [
-		{ name: 'latest', layer: '10c37f0780ca1d1602fcb720b29b3542a2d24ea9' },
-		{ name: '1.0.1', layer: 'cfc5fe3a1d6f7e773eb019d04681697648d23e76' },
-		{ name: '2.0.0', layer: '3861a21803fcd9eb92a403027b0da2bb7add4de1' }
-	];
 };
 
 var getDetails = function(options, match) {
@@ -160,8 +158,9 @@ var FakeClient = function() {
 
 FakeClient.prototype.request = function(options, callback) {
 	var match;
+	var path = options.path.replace(/[\/\?]+$/, '');
 	var pattern = _.find(this.patterns, function(pattern) {
-		return !!(match = options.path.match(pattern.match)) && options.method.indexOf(pattern.method) >= 0;
+		return !!(match = path.match(pattern.match)) && options.method.indexOf(pattern.method) >= 0;
 	}) || this.defaultPattern;
 
 	callback({
@@ -214,9 +213,15 @@ FakeClient.prototype.when = function(match, method) {
 var mockClient = new FakeClient();
 
 module.exports = mockClient
-	.when('/v1/search*').then(function (options) { return getImages(getQueryFromPath(options.path)); })
-	.when('/v1/repositories/**/tags').then(getTags())
-	.when('/v1/repositories/**/tags/*', 'DELETE').then(_.identity)
-	.when('/v1/repositories/**', 'DELETE').then(_.identity)
+	.when('/v1/search*').then(function (options) { return getRepositories(getQueryFromPath(options.path)); })
+	.when('/v1/repositories/**/tags').then(function(options, args) { return tags[args[1]]; })
+	.when('/v1/repositories/**/tags/*', 'DELETE').then(function(options, args) {
+		tags[args[1]] = _.without(tags[args[1]], _.find(tags[args[1]], 'name', args[2]));
+		return "";
+	 })
+	.when('/v1/repositories/**', 'DELETE').then(function(options, args) {
+		repositories = _.without(repositories, _.find(repositories, {name: args[1]}));
+		return "";
+	})
 	.when('/v1/images/*/json').then(getDetails)
 	.when('/v1/images/*/ancestry').then(getAncestry());
