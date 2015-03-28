@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var querystring = require('querystring');
 
 var repositories = [
 { "name": "kjunine/ubuntu", "description": "Docker for Ubuntu Trusty" },
@@ -103,36 +104,60 @@ var repositories = [
 { "name": "st2py/ubuntu", "description": "" },
 ];
 
-var tags = _.zipObject(_.map(repositories, 'name'), _.map(repositories, _.constant([
-	{ name: 'latest', layer: '10c37f0780ca1d1602fcb720b29b3542a2d24ea9' },
-	{ name: '1.0.1', layer: 'cfc5fe3a1d6f7e773eb019d04681697648d23e76' },
-	{ name: '2.0.0', layer: '3861a21803fcd9eb92a403027b0da2bb7add4de1' }
-])));
+var ancestries = _.map(_.range(5), function() {
+	return _.sample('0123456789abcdef0123456789abcdef0123456789abcdef', 40).join('');
+});
 
-var getQueryFromPath = function(path) {
-	return require('querystring').parse(path.substring(path.indexOf('?') + 1));
+_.forEach(repositories, function(repository) {
+	repository._tags = [
+		{ name: 'latest', layer: ancestries[0] },
+		{ name: '1.0.1', layer: ancestries[1] },
+		{ name: '2.0.0', layer: ancestries[2] }
+	];
+});
+
+repositories = _.indexBy(repositories, 'name');
+
+var MemoryRegistry = function(repositories, ancestries) {
+	this.repositories = repositories;
+	this.ancestries = ancestries;
 };
 
-var getRepositories = function(queries) {
-	var pageSize = queries.n || 25;
-	var results = _.filter(repositories, function(repository) {
-		return repository.name.indexOf(queries.q) >= 0;
+MemoryRegistry.prototype.search = function(query, page, pageSize) {
+	page = page || 1;
+	pageSize = pageSize || 25;
+	var results = _.filter(this.repositories, function(repository) {
+		return repository.name.indexOf(query) >= 0;
+	});
+	var resultPage = _.map(results.slice((page - 1) * pageSize, page * pageSize), function(result) {
+		return _.omit(result, function(value, key) { return key.indexOf('_') === 0; });
 	});
 	return {
-		'num_pages': Math.ceil(results.length/pageSize),
+		'num_pages': Math.ceil(results.length / pageSize),
 		'num_results': results.length,
 		'page_size': pageSize,
-		'query': queries.q,
-		'page': queries.page,
-		'results': results.slice((queries.page - 1) * pageSize, queries.page * pageSize)
+		'query': query,
+		'page': page,
+		'results': resultPage,
 	};
 };
 
-var getDetails = function(options, match) {
-	var id = match[1];
+MemoryRegistry.prototype.tags = function(repositoryName) {
+	return this.repositories[repositoryName]._tags;
+};
+
+MemoryRegistry.prototype.deleteRepository = function(repositoryName) {
+	delete this.repositories[repositoryName];
+};
+
+MemoryRegistry.prototype.deleteTag = function(repositoryName, tagName) {
+	_.remove(this.repositories[repositoryName]._tags, function(tag) { return tag.name === tagName; });
+};
+
+MemoryRegistry.prototype.image = function(id) {
 	return {
 		'id': id,
-		'parent': '06a7195811199d4eaee18482fc151c2443cd73e0',
+		'parent': this.ancestries[this.ancestries.indexOf(id) + 1],
 		'created': '2011-01-01',
 		'architecture': 'amd64',
 		'os': 'linux',
@@ -140,15 +165,12 @@ var getDetails = function(options, match) {
 	};
 };
 
-var getAncestry = function() {
-	return [
-		'10c37f0780ca1d1602fcb720b29b3542a2d24ea9',
-		'cfc5fe3a1d6f7e773eb019d04681697648d23e76',
-		'3861a21803fcd9eb92a403027b0da2bb7add4de1',
-	];
-}
+MemoryRegistry.prototype.ancestry = function(imageId) {
+	return this.ancestries.slice(this.ancestries.indexOf(imageId));
+};
 
-var FakeClient = function() {
+var FakeClient = function(registry) {
+	this.registry = registry;
 	this.patterns = [];
 	this.defaultPattern = {
 		code: 404,
@@ -157,18 +179,19 @@ var FakeClient = function() {
 };
 
 FakeClient.prototype.request = function(options, callback) {
-	var match;
-	var path = options.path.replace(/[\/\?]+$/, '');
+	var args;
+	var path = options.path.replace(/\/*\?.*$/, '');
 	var pattern = _.find(this.patterns, function(pattern) {
-		return !!(match = path.match(pattern.match)) && options.method.indexOf(pattern.method) >= 0;
+		return !!(args = path.match(pattern.match)) && options.method.indexOf(pattern.method) >= 0;
 	}) || this.defaultPattern;
 
+	var self = this;
 	callback({
 		statusCode: pattern.code,
 		headers: { 'content-type': 'application/json' },
 		on: function(trigger, callback) {
 			if (trigger === 'data') {
-				var data = JSON.stringify(pattern.action(options, match));
+				var data = JSON.stringify(pattern.action(self.registry, args, options));
 				callback(data);
 			} else if (trigger === 'end') {
 				callback();
@@ -210,18 +233,25 @@ FakeClient.prototype.when = function(match, method) {
 	};
 };
 
-var mockClient = new FakeClient();
-
-module.exports = mockClient
-	.when('/v1/search*').then(function (options) { return getRepositories(getQueryFromPath(options.path)); })
-	.when('/v1/repositories/**/tags').then(function(options, args) { return tags[args[1]]; })
-	.when('/v1/repositories/**/tags/*', 'DELETE').then(function(options, args) {
-		tags[args[1]] = _.without(tags[args[1]], _.find(tags[args[1]], 'name', args[2]));
-		return "";
-	 })
-	.when('/v1/repositories/**', 'DELETE').then(function(options, args) {
-		repositories = _.without(repositories, _.find(repositories, {name: args[1]}));
-		return "";
-	})
-	.when('/v1/images/*/json').then(getDetails)
-	.when('/v1/images/*/ancestry').then(getAncestry());
+module.exports = new FakeClient(new MemoryRegistry(repositories, ancestries))
+.when('/v1/search').then(function (registry, args, options) {
+	var query = querystring.parse(options.path.match(/.*\?(.*)/)[1] || '');
+	return registry.search(query.q, query.page, query.n);
+})
+.when('/v1/repositories/**/tags').then(function(registry, args) {
+	return registry.tags(args[1]);
+})
+.when('/v1/repositories/**/tags/*', 'DELETE').then(function(registry, args) {
+	registry.deleteTag(args[1], args[2]);
+	return "";
+})
+.when('/v1/repositories/**', 'DELETE').then(function(registry, args) {
+	registry.deleteRepository(args[1]);
+	return "";
+})
+.when('/v1/images/*/json').then(function(registry, args) {
+	return registry.image(args[1]);
+})
+.when('/v1/images/*/ancestry').then(function(registry, args) {
+	return registry.ancestry(args[1]);
+});
