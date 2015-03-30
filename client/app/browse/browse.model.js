@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('registryExplorerApp')
-.factory('Repository', function($resource) {
+.factory('Repository', function($resource, $q) {
 	return $resource('/proxy/:protocol/:hostname/:port/v1/search?q=:query&page=:page', {protocol: 'http', port: '-'}, {
 		'query': {
 			params: {page: 1},
@@ -16,6 +16,9 @@ angular.module('registryExplorerApp')
 						repository.name = matches[2];
 					});
 					return response.data;
+				},
+				responseError: function(response) {
+					return $q.reject(response.data);
 				}
 			},
 		},
