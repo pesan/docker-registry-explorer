@@ -20,16 +20,16 @@ describe('Controller: MainCtrl', function () {
 		MainCtrl = $controller('MainCtrl', {
 			$scope: scope,
 			$state: state,
-			officialHostname: 'official.registry.com',
+			officialRegistry: { protocol: 'https', hostname: 'official.registry.com', port: 443 },
 			history: history,
-			host: 'localhost',
+			localRegistry: { protocol: 'http', hostname: 'localhost', port: 80 },
 		});
 	}));
 
 	it('should initialize', function () {
 		expect(scope.history).to.equal(history);
-		expect(scope.host).to.eql('localhost');
-		expect(scope.official).to.eql('official.registry.com');
+		expect(scope.localRegistry).to.eql({ protocol: 'http', hostname: 'localhost', port: 80 });
+		expect(scope.officialRegistry).to.eql({ protocol: 'https', hostname: 'official.registry.com', port: 443 });
 	});
 
 	it('should change state to browse', function () {

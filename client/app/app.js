@@ -8,7 +8,18 @@ angular.module('registryExplorerApp', [
 	'ui.bootstrap',
 	'LocalStorageModule',
 ])
-.constant('officialHostname', 'registry.hub.docker.com')
+.constant('officialRegistry', {
+	protocol: 'https',
+	hostname: 'registry.hub.docker.com',
+	port: 443
+})
+.factory('localRegistry', function($location) {
+	return {
+		protocol: 'http',
+		hostname: $location.host(),
+		port: 5000
+	};
+})
 .controller('RootCtrl', function($scope, $rootScope, $state, $timeout, errorModal, Version) {
 	$scope.timedLoading = false;
 	$scope.loading = false;

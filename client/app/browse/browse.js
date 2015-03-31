@@ -15,6 +15,9 @@ angular.module('registryExplorerApp')
 					port: $stateParams.port,
 				};
 			},
+			'isOfficial': function(registry, officialRegistry) {
+				return registry.hostname === officialRegistry.hostname;
+			}
 		},
 	})
 	.state('browse.list', {
@@ -61,7 +64,7 @@ angular.module('registryExplorerApp')
 		}
 	});
 })
-.factory('RegistryUrl', function(officialHostname) {
+.factory('RegistryUrl', function(officialRegistry) {
 	return {
 		parse: function(text) {
 			var match = text.match(/^(?:(https?):\/\/)?([\da-z\.-]+)(?::(\d+))?([\/\w \.-]*)*\/?$/);
@@ -78,7 +81,7 @@ angular.module('registryExplorerApp')
 			return registry.protocol + '://' + registry.hostname + ':' + registry.port;
 		},
 		stringifyTag: function(registry, repository, tag) {
-			var isOfficial = (registry.hostname === officialHostname);
+			var isOfficial = (registry.hostname === officialRegistry.hostname);
 			return (isOfficial ? '' : (registry.hostname + ':' + registry.port) + '/') + repository.fullName + ':' + tag.name;
 		},
 	};

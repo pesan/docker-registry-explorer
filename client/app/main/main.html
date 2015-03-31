@@ -30,13 +30,13 @@
 		<div class="col-xs-12">
 			<div class="list-unstyled">
 				<li>
-					<a ui-sref="browse.list(toRegistry('https://' + official))">
+					<a ui-sref="browse.list(officialRegistry)">
 						Browse official registry <i class="fa fa-angle-double-right"></i>
 					</a>
 				</li>
 				<li>
-					<a ui-sref="browse.list(toRegistry(host+':5000'))">
-						Browse registry at {{ host }}:5000 <i class="fa fa-angle-double-right"></i>
+					<a ui-sref="browse.list(localRegistry)">
+						Browse registry at {{ localRegistry.hostname}}:{{ localRegistry.port }} <i class="fa fa-angle-double-right"></i>
 					</a>
 				</li>
 			</div>

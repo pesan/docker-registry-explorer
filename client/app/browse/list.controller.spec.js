@@ -53,6 +53,7 @@ describe('Controller: ListCtrl', function () {
 			$state: state,
 			History: History,
 			state: { query: 'ubuntu', page: 3 },
+			isOfficial: false,
 			repositories: repositories,
 			registry: registry,
 			tags: tags,

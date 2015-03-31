@@ -2,8 +2,8 @@
 
 angular.module('registryExplorerApp')
 .constant('pagerSize', 10)
-.controller('ListCtrl', function (Tag, Repository, History, officialHostname, $scope, $state, pagerSize, repositories, registry, tags, state, errorModal) {
-	$scope.isOfficial = (officialHostname === registry.hostname);
+.controller('ListCtrl', function (Tag, Repository, History, isOfficial, $scope, $state, pagerSize, repositories, registry, tags, state, errorModal) {
+	$scope.isOfficial = isOfficial;
 	$scope.registry = registry;
 	$scope.repositories = repositories;
 	$scope.tags = tags;

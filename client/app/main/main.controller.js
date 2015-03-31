@@ -1,18 +1,16 @@
 'use strict';
 
 angular.module('registryExplorerApp')
-.controller('MainCtrl', function (RegistryUrl, officialHostname, $scope, $state, host, history) {
-	$scope.host = host;
+.controller('MainCtrl', function ($scope, $state, RegistryUrl, officialRegistry, localRegistry, history) {
 	$scope.history = history;
-	$scope.official = officialHostname;
-
-	$scope.toRegistry = RegistryUrl.parse;
+	$scope.officialRegistry = officialRegistry;
+	$scope.localRegistry = localRegistry;
 
 	$scope.browse = function(registryUrl) {
 		if (!registryUrl) {
 			return;
 		}
 
-		$state.go('browse.list', $scope.toRegistry(registryUrl));
+		$state.go('browse.list', RegistryUrl.parse(registryUrl));
 	};
 });
