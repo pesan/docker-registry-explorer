@@ -5,18 +5,20 @@
 		<form ng-submit="browse(registryUrl)">
 			<div class="row">
 				<div class="col-sm-12 col-md-offset-3 col-md-6 text-center">
-					<div class="input-group">
-						<input
-							class="form-control"
-							type="text"
-							placeholder="Registry URL"
-							focus
-							ng-model="registryUrl"
-							typeahead="recent for recent in history|filter:$viewValue">
-						</input>
-						<span class="input-group-btn">
-							<button class="btn btn-default">Browse</button>
-						</span>
+					<div class="sunken">
+						<div class="input-group">
+							<input
+								class="form-control"
+								type="text"
+								placeholder="Registry URL"
+								focus
+								ng-model="registryUrl"
+								typeahead="recent for recent in history|filter:$viewValue">
+							</input>
+							<span class="input-group-btn">
+								<button class="btn btn-default">Browse</button>
+							</span>
+						</div>
 					</div>
 				</div>
 			</div>
