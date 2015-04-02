@@ -9,15 +9,16 @@ Simple Registry Explorer for Docker containers.
 ![Screenshot](/../meta/detail-1.png?raw=true "Screenshot")
 
 ## Features
- * Can explore registries on any host.
- * Can keyword search on image name.
- * Can show the pull URL for an image tag.
- * Can display ancestry for an image.
+ * Explore registries on any host.
+ * Keyword search on repository name.
+ * Show the pull URL for an repository tag.
+ * Display ancestry for an image.
+ * Delete repositories and tags
 
 ## Building and running
 
 ### Run from official Docker image
- 1. Execute `docker run -it --rm -p 8080:8080 pesan/registry-explorer:1.2`.
+ 1. Execute `docker run -it --rm -p 8080:8080 pesan/registry-explorer:1.2.1`.
  2. Visit [http://localhost:8080](http://localhost:8080).
 
 ### Building and running using Grunt
