@@ -20,20 +20,30 @@ angular.module('registryExplorerApp', [
 		port: 5000
 	};
 })
-.controller('RootCtrl', function($scope, $rootScope, $state, $timeout, errorModal, Version) {
-	$scope.timedLoading = false;
-	$scope.loading = false;
-	$scope.version = Version.query();
+.config(function ($urlRouterProvider, $locationProvider) {
+	$urlRouterProvider.otherwise('/');
+	$locationProvider.html5Mode(true);
+})
+.config(function (localStorageServiceProvider) {
+	localStorageServiceProvider.setPrefix('registry-explorer');
+})
+.config(function ($resourceProvider) {
+	$resourceProvider.defaults.stripTrailingSlashes = false;
+})
+.run(function($rootScope, $timeout, $state, errorModal, Version) {
+	$rootScope.timedLoading = false;
+	$rootScope.loading = false;
+	$rootScope.version = Version.query();
 
 	var beginLoading = function() {
-		$scope.timedLoading = true;
+		$rootScope.timedLoading = true;
 		$timeout(function() {
-			$scope.loading = $scope.timedLoading;
+			$rootScope.loading = $rootScope.timedLoading;
 		}, 250);
 	};
 
 	var endLoading = function() {
-		$scope.loading = $scope.timedLoading = false;
+		$rootScope.loading = $rootScope.timedLoading = false;
 	};
 
 	$rootScope.$on('$stateChangeStart', beginLoading);
@@ -41,7 +51,7 @@ angular.module('registryExplorerApp', [
 	$rootScope.$on('$stateChangeError', function(evt, toState, toArgs, fromState, fromArgs, cause) {
 		endLoading();
 
-		errorModal((cause && cause.data && cause.data.error && cause.data.error.message) || JSON.stringify(cause), {
+		errorModal((cause && cause.error && cause.error.message) || JSON.stringify(cause), {
 			onTryAgain: function() {
 				$timeout(function () {
 					$state.go(toState.name, toArgs);
@@ -53,16 +63,6 @@ angular.module('registryExplorerApp', [
 			onCancel: fromState.name ? _.identity : undefined
 		});
 	});
-})
-.config(function ($urlRouterProvider, $locationProvider) {
-	$urlRouterProvider.otherwise('/');
-	$locationProvider.html5Mode(true);
-})
-.config(function (localStorageServiceProvider) {
-	localStorageServiceProvider.setPrefix('registry-explorer');
-})
-.config(function ($resourceProvider) {
-	$resourceProvider.defaults.stripTrailingSlashes = false;
 })
 .directive('focus',
     function($timeout) {
