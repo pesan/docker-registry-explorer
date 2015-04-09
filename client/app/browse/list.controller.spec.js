@@ -8,9 +8,12 @@ describe('Controller: ListCtrl', function () {
 	var state;
 
 	var History;
+	var Repository;
+	var Tag;
 	var repositories;
 	var registry;
 	var tags;
+	var errorModal;
 
 	beforeEach(inject(function ($controller, $rootScope) {
 		state = {
@@ -46,6 +49,16 @@ describe('Controller: ListCtrl', function () {
 			port: 8080
 		};
 
+		Repository = {
+			'delete': sinon.spy(),
+		};
+
+		Tag = {
+			'delete': sinon.spy(),
+		};
+
+		errorModal = sinon.spy();
+
 		scope = $rootScope.$new();
 		scope.$on = sinon.spy();
 		ListCtrl = $controller('ListCtrl', {
@@ -58,6 +71,9 @@ describe('Controller: ListCtrl', function () {
 			registry: registry,
 			tags: tags,
 			pagerSize: 5,
+			Repository: Repository,
+			Tag: Tag,
+			errorModal: errorModal,
 		});
 	}));
 
@@ -82,6 +98,79 @@ describe('Controller: ListCtrl', function () {
 			expect(History.add).to.have.been.calledWith(registry);
 			return true;
 		}));
+	});
+
+	describe('delete repository', function() {
+		beforeEach(function() {
+			scope.deleteRepository({
+				name: 'debian',
+				namespace: 'dockerfile',
+			});
+		});
+
+		it('should delete the repository on the registry', function() {
+			expect(Repository.delete).to.have.been.calledWith({
+				protocol: 'http',
+				hostname: 'registry.example.com',
+				port: 8080,
+				namespace: 'dockerfile',
+				name: 'debian',
+			});
+		});
+
+		it('should reload when successful', function() {
+			expect(Repository.delete).to.have.been.calledWith(sinon.match.any, sinon.match(function(onSuccess) {
+				scope.restate = sinon.spy();
+				onSuccess();
+				expect(scope.restate).to.have.been.calledWith({reload: true});
+				return true;
+			}));
+		});
+
+		it('should display error modal when failing', function() {
+			expect(Repository.delete).to.have.been.calledWith(sinon.match.any, sinon.match.any, sinon.match(function(onError) {
+				onError({ data: { error: 'error message' } });
+				expect(errorModal).to.have.been.calledWith('error message');
+				return true;
+			}));
+		});
+	});
+
+	describe('delete tag', function() {
+		beforeEach(function() {
+			var tag = _.find(scope.tags['dockerfile/debian'], 'name', '6.0');
+			scope.deleteTag(
+				{ name: 'debian', namespace: 'dockerfile', fullName: 'dockerfile/debian' },
+				tag
+			);
+		});
+
+		it('should delete the tag on the registry', function() {
+			expect(Tag.delete).to.have.been.calledWith({
+				protocol: 'http',
+				hostname: 'registry.example.com',
+				port: 8080,
+				namespace: 'dockerfile',
+				name: 'debian',
+				tag: '6.0',
+			});
+		});
+
+		it('should reload when successful', function() {
+			expect(Tag.delete).to.have.been.calledWith(sinon.match.any, sinon.match(function(onSuccess) {
+				onSuccess();
+				expect(_.find(scope.tags['dockerfile/debian'], 'name', '6.0')).to.be.undefined;
+				return true;
+			}));
+		});
+
+		it('should display error modal when failing', function() {
+			expect(Tag.delete).to.have.been.calledWith(sinon.match.any, sinon.match.any, sinon.match(function(onError) {
+				onError({ data: { error: 'error message' } });
+				expect(errorModal).to.have.been.calledWith('error message');
+				return true;
+			}));
+		});
 	});
 
 	it('should restate with current state information', function() {
