@@ -67,10 +67,10 @@ angular.module('registryExplorerApp', [
 .directive('focus',
     function($timeout) {
         return {
-            scope : {
+            scope: {
                 focus: '='
             },
-            link : function(scope, element) {
+            link: function(scope, element) {
                 if (scope.focus) {
                     $timeout(function() {
                         element[0].focus();
@@ -80,20 +80,20 @@ angular.module('registryExplorerApp', [
         };
     }
 )
-.service('History', function(RegistryUrl, localStorageService, $location) {
-	var history = localStorageService.get('history') || [$location.host() + ':5000'];
+.service('History', function(RegistryUrl, localStorageService, localRegistry) {
+	var history = localStorageService.get('history') || [ RegistryUrl.stringify(localRegistry) ];
 	var model = {
 		last: _.last(history),
 		all: history,
 		add: function(registry) {
-			var registryText = RegistryUrl.stringify(registry);
-			var index = history.indexOf(registryText);
+			var url = RegistryUrl.stringify(registry);
+			var index = history.indexOf(url);
 			if (index >= 0) {
 				history.splice(index, 1);
 			}
-			history.push(registryText);
+			history.push(url);
 			localStorageService.set('history', history);
-			model.last = registryText;
+			model.last = url;
 		},
 	};
 	return model;

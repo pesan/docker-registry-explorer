@@ -2,9 +2,9 @@
 
 angular.module('registryExplorerApp')
 .factory('Repository', function($resource, $q) {
-	return $resource('/proxy/:protocol/:hostname/:port/v1/search?q=:query&page=:page', {protocol: 'http', port: '-'}, {
+	return $resource('/proxy/:protocol/:hostname/:port/v1/search?q=:query&page=:page', {}, {
 		'query': {
-			params: {page: 1},
+			params: { page: 1 },
 			method: 'GET',
 			isArray: false,
 			interceptor: {
@@ -29,7 +29,7 @@ angular.module('registryExplorerApp')
 	});
 })
 .factory('Image', function($resource) {
-	return $resource('/proxy/:protocol/:hostname/:port/v1/images/:id/json', {protocol: 'http', port: '-'}, {
+	return $resource('/proxy/:protocol/:hostname/:port/v1/images/:id/json', {}, {
 		'query': {
 			method: 'GET',
 			isArray: false,
@@ -37,7 +37,7 @@ angular.module('registryExplorerApp')
 	});
 })
 .factory('Tag', function($resource) {
-	return $resource('/proxy/:protocol/:hostname/:port/v1/repositories/:namespace/:name/tags', {protocol: 'http', port: '-'}, {
+	return $resource('/proxy/:protocol/:hostname/:port/v1/repositories/:namespace/:name/tags', {}, {
 		'query': {
 			method: 'GET',
 			isArray: true,
@@ -57,7 +57,7 @@ angular.module('registryExplorerApp')
 	});
 })
 .factory('Ancestry', function($resource) {
-	return $resource('/proxy/:protocol/:hostname/:port/v1/images/:id/ancestry', {protocol: 'http', port: '-'}, {
+	return $resource('/proxy/:protocol/:hostname/:port/v1/images/:id/ancestry', {}, {
 		'query': {
 			method: 'GET',
 			isArray: true,

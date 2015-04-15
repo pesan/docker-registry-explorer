@@ -98,7 +98,7 @@ angular.module('registryExplorerApp')
 		},
 		template:
 			'<a ui-sref="browse.list(data)" class="btn btn-xs context-keyword" title="Search for \'{{ keyword }}\'">' +
-			'{{ keyword }}' +
+			'	{{ keyword }}' +
 			'</a>'
 	};
 })
