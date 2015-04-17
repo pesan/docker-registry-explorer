@@ -48,10 +48,10 @@ angular.module('registryExplorerApp', [
 
 	$rootScope.$on('$stateChangeStart', beginLoading);
 	$rootScope.$on('$stateChangeSuccess', endLoading);
-	$rootScope.$on('$stateChangeError', function(evt, toState, toArgs, fromState, fromArgs, cause) {
+	$rootScope.$on('$stateChangeError', function(evt, toState, toArgs, fromState, fromArgs, response) {
 		endLoading();
 
-		errorModal((cause && cause.error && cause.error.message) || JSON.stringify(cause), {
+		errorModal((response.data && response.data.error && response.data.error.message) || JSON.stringify(response.data), {
 			onTryAgain: function() {
 				$timeout(function () {
 					$state.go(toState.name, toArgs);
